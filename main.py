@@ -5,6 +5,7 @@ import pathlib
 import typing
 
 import numpy as np
+from numpy import random
 from matplotlib import pyplot as plt
 from sklearn import cluster, inspection, mixture, model_selection, neighbors
 
@@ -305,13 +306,28 @@ _ = display.ax_.set_title("K-Means Classifier")
 _ = display.ax_.axis([0, 1, 0, 1])
 plt.show()
 
-# # Use agglomerative clustering to train on these axes.
-# ac_classifier = cluster.AgglomerativeClustering(2).fit(X_train, y_train)
-# print(f"Agglomerative clustering score: {ac_classifier.score(X_test, y_test)}")
-# inspection.DecisionBoundaryDisplay.from_estimator(ac_classifier, X_test)
-
 # # Use expectation-maximization for learning a Gaussian mixture model to train on these
 # # axes.
-# em_classifier = mixture.GaussianMixture(2).fit(X_train)
-# print(f"Expectation-maximization score: {em_classifier.score(X_test)}")
-# inspection.DecisionBoundaryDisplay.from_estimator(em_classifier, X_test)
+em_classifier = mixture.GaussianMixture(2).fit(X_train)
+print(f"Expectation-maximization score: {em_classifier.score(X_test)}")
+display = inspection.DecisionBoundaryDisplay.from_estimator(
+    em_classifier,
+    X,
+    plot_method="pcolormesh",
+    response_method="predict",
+    xlabel="Number of Created Discussions (NCD)",
+    ylabel="Number of Authors (NA)",
+    ax=plt.gca(),
+    shading="auto",
+    alpha=0.5,
+)
+scatter = display.ax_.scatter(X[:, 0], X[:, 1], c=y, edgecolors="k")
+_ = display.ax_.legend(
+    scatter.legend_elements()[0],
+    ("Twitter", "Tom's Hardware"),
+    loc="lower right",
+    title="Sources",
+)
+_ = display.ax_.set_title("Expectation-Maximization Classifier")
+_ = display.ax_.axis([0, 1, 0, 1])
+plt.show()
