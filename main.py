@@ -2,6 +2,7 @@
 
 import csv
 import pathlib
+import typing
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -187,58 +188,54 @@ toms_data = np.hstack((toms_data, np.ones((toms_data.shape[0], 1))))
 # Finally, we can concatenate the datasets.
 merged_data = np.vstack((twitter_data, toms_data))
 
-# Set constants for accessing data.
-num_time_steps = 7
-num_features = merged_data.shape[1] - 1
-num_primary_features = (int)(num_features / num_time_steps)
-primary_feature_abbr = (
-    "NCD",
-    "AI",
-    "AS(NA)",
-    "BL",
-    "NAC",
-    "AS(NAC)",
-    "CS",
-    "AT",
-    "NA",
-    "ADL",
-    "NAD",
-)
-primary_feature_labels = (
-    "Number of Created Discussions",
-    "Author Increase",
-    "Attention Level Measured with Number of Authors",
-    "Burstiness Level",
-    "Number of Atomic Containers",
-    "Attention Level",
-    "Contribution Sparseness",
-    "Author Interaction",
-    "Number of Authors",
-    "Average Discussions Length",
-    "Number of Active Discussions",
-)
 
-# For each time step...
-for t in range(num_time_steps):
-    # For each axis...
-    for x in range(num_primary_features):
-        # For each other axis...
-        for y in range(num_primary_features):
-            # Don't compare to self or repeat with swapped axes.
-            if y <= x:
-                continue
+def display_all_axes(
+    data: np.ndarray,
+    num_time_steps: int,
+    abbreviations: typing.Sequence[str],
+    labels: typing.Sequence[str],
+) -> None:
+    """Display every combination of axes in the given dataset.
 
-            # Plot the axes against each other.
-            plt.figure(num=f"t={t} {primary_feature_abbr[x]}x{primary_feature_abbr[y]}")
-            plt.title(f"Time Step {t}")
-            plt.xlabel(f"{primary_feature_labels[x]} ({primary_feature_abbr[x]})")
-            plt.ylabel(f"{primary_feature_labels[y]} ({primary_feature_abbr[y]})")
-            plt.scatter(
-                merged_data[:, x * num_time_steps + t],
-                merged_data[:, y * num_time_steps + t],
-                color=[
-                    ("blue" if source_set == 0 else "red")
-                    for source_set in merged_data[:, -1]
-                ],
-            )
-            plt.show()
+    Args:
+        data:
+            The dataset. Expected to have data organized into groups of
+            `num_time_steps` columns representing the same data over `num_time_steps`
+            time steps. The last column is expected to represent the dataset that the
+            instance originated from and should contain only zeros and ones.
+        num_time_steps: The number of time steps in the data.
+        abbreviations:
+            The abbreviations for each of the primary features in the order in which
+            they appear.
+        labels:
+            The labels for each of the primary features in the order in which they
+            appear.
+    """
+    # Set constants for accessing data.
+    num_features = data.shape[1] - 1
+    num_primary_features = (int)(num_features / num_time_steps)
+
+    # For each time step...
+    for t in range(num_time_steps):
+        # For each axis...
+        for x in range(num_primary_features):
+            # For each other axis...
+            for y in range(num_primary_features):
+                # Don't compare to self or repeat with swapped axes.
+                if y <= x:
+                    continue
+
+                # Plot the axes against each other.
+                plt.figure(num=f"t={t} {abbreviations[x]}x{abbreviations[y]}")
+                plt.title(f"Time Step {t}")
+                plt.xlabel(f"{labels[x]} ({abbreviations[x]})")
+                plt.ylabel(f"{labels[y]} ({abbreviations[y]})")
+                plt.scatter(
+                    data[:, x * num_time_steps + t],
+                    data[:, y * num_time_steps + t],
+                    color=[
+                        ("blue" if source_set == 0 else "red")
+                        for source_set in data[:, -1]
+                    ],
+                )
+                plt.show()
