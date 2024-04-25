@@ -1,4 +1,5 @@
+.ipynb_checkpoints
 .ruff_cache
 .venv
-*.data
 .DS_store
+*.data
