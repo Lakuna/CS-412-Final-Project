@@ -1,8 +1,9 @@
 """CS 412 final project."""
 
 import csv
+import pathlib
+
 import numpy as np
-from matplotlib import pyplot as plt
 
 # Load Twitter data into a NumPy array.
 #
@@ -44,11 +45,11 @@ from matplotlib import pyplot as plt
 # - Feature to Predict (column $77$): Measures the mean NAD, which describes the
 #   popularity of the instance's topic.
 #   Column $77$ represents the mean NAD, abbreviated $NAD$.
-with open("Twitter.data") as csvfile:
+with pathlib.Path.open("Twitter.data") as csvfile:
     twitter_data = np.array(list(csv.reader(csvfile)), dtype=np.float64)
 print(
     f"Loaded Twitter data: {twitter_data.shape[0]} instances, "
-    + "{twitter_data.shape[1]} features."
+    f"{twitter_data.shape[1]} features."
 )
 
 # Load Tom's Hardware data into a NumPy array.
@@ -94,11 +95,11 @@ print(
 # - Feature to Predict (column $96$): Measures the mean ND, which describes the
 #   popularity of the instance's topic.
 #   Column $96$ represents the mean ND, abbreviated $ND$.
-with open("TomsHardware.data") as csvfile:
+with pathlib.Path.open("TomsHardware.data") as csvfile:
     toms_data = np.array(list(csv.reader(csvfile)), dtype=np.float64)
 print(
     f"Loaded Tom's Hardware data: {toms_data.shape[0]} instances, "
-    + "{toms_data.shape[1]} features."
+    f"{toms_data.shape[1]} features."
 )
 
 # At this point, there are a few issues that need to be resolved in order to create a
