@@ -253,34 +253,57 @@ X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, strati
 # determined that choice of $k$ barely matters (with $k=1$ giving the best accuracy).
 knn_classifier = neighbors.KNeighborsClassifier(1).fit(X_train, y_train)
 print(f"K-nearest neighbors (k=1) score: {knn_classifier.score(X_test, y_test)}")
-
-# Display k-nearest neighbors result.
-axis = plt.gca()
-axis.set_xlim((0, 1))
-axis.set_ylim((0, 1))
 display = inspection.DecisionBoundaryDisplay.from_estimator(
     knn_classifier,
-    X_test,
+    X,
     plot_method="pcolormesh",
     xlabel="Number of Created Discussions (NCD)",
     ylabel="Number of Authors (NA)",
+    ax=plt.gca(),
     shading="auto",
     alpha=0.5,
-    ax=axis,
 )
 scatter = display.ax_.scatter(X[:, 0], X[:, 1], c=y, edgecolors="k")
 _ = display.ax_.legend(
     scatter.legend_elements()[0],
-    ["Twitter", "Tom's Hardware"],
+    ("Twitter", "Tom's Hardware"),
     loc="lower right",
-    title="Classes",
+    title="Sources",
 )
-_ = display.ax_.set_title("KNN (K=1) Classification")
+_ = display.ax_.set_title("KNN (K=1) Classifier")
+_ = display.ax_.axis([0, 1, 0, 1])
 plt.show()
 
-# # Use k-means clustering to train on these axes.
-# km_classifier = cluster.KMeans(2).fit(X_train)
-# print(f"K-means score: {km_classifier.score(X_test)}")
+# Use k-means clustering to train on these axes.
+km_classifier = cluster.KMeans(2).fit(X_train)
+print(f"K-means score: {km_classifier.score(X_test)}")
+display = inspection.DecisionBoundaryDisplay.from_estimator(
+    km_classifier,
+    X,
+    plot_method="pcolormesh",
+    response_method="predict",
+    xlabel="Number of Created Discussions (NCD)",
+    ylabel="Number of Authors (NA)",
+    ax=plt.gca(),
+    shading="auto",
+    alpha=0.5,
+)
+scatter = display.ax_.scatter(X[:, 0], X[:, 1], c=y, edgecolors="k")
+_ = display.ax_.legend(
+    scatter.legend_elements()[0],
+    ("Twitter", "Tom's Hardware"),
+    loc="lower right",
+    title="Sources",
+)
+_ = display.ax_.scatter(
+    km_classifier.cluster_centers_[:, 0],
+    km_classifier.cluster_centers_[:, 1],
+    color=["blue", "red"],
+    edgecolors="k",
+)
+_ = display.ax_.set_title("K-Means Classifier")
+_ = display.ax_.axis([0, 1, 0, 1])
+plt.show()
 
 # # Use agglomerative clustering to train on these axes.
 # ac_classifier = cluster.AgglomerativeClustering(2).fit(X_train, y_train)
