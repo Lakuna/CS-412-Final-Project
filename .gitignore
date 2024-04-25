@@ -1,4 +1,4 @@
 .ruff_cache
 .venv
-/regression
-**/.DS_store
+*.data
+.DS_store
