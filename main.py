@@ -47,10 +47,6 @@ import numpy as np
 #   Column $77$ represents the mean NAD, abbreviated $NAD$.
 with pathlib.Path.open("Twitter.data") as csvfile:
     twitter_data = np.array(list(csv.reader(csvfile)), dtype=np.float64)
-print(
-    f"Loaded Twitter data: {twitter_data.shape[0]} instances, "
-    f"{twitter_data.shape[1]} features."
-)
 
 # Load Tom's Hardware data into a NumPy array.
 #
@@ -97,10 +93,6 @@ print(
 #   Column $96$ represents the mean ND, abbreviated $ND$.
 with pathlib.Path.open("TomsHardware.data") as csvfile:
     toms_data = np.array(list(csv.reader(csvfile)), dtype=np.float64)
-print(
-    f"Loaded Tom's Hardware data: {toms_data.shape[0]} instances, "
-    f"{toms_data.shape[1]} features."
-)
 
 # At this point, there are a few issues that need to be resolved in order to create a
 # merged dataset:
@@ -146,19 +138,10 @@ print(
 # From Twitter:
 # - The prediction column: 77.
 twitter_data = np.delete(twitter_data, (77), axis=1)
-print(
-    f"Trimmed Twitter data: {twitter_data.shape[0]} instances, "
-    f"{twitter_data.shape[1]} features."
-)
-
 toms_data = np.delete(
     toms_data,
     (7, 15, 23, 31, 39, 40, 41, 42, 43, 44, 45, 46, 47, 55, 63, 71, 79, 87, 95, 96),
     axis=1,
-)
-print(
-    f"Trimmed Tom's Hardware data: {toms_data.shape[0]} instances, "
-    f"{toms_data.shape[1]} features."
 )
 
 # Then, rearrange the columns in the Tom's Hardware dataset to match the order of the
@@ -179,7 +162,18 @@ toms_data = toms_data[:, (
     35, 36, 37, 38, 39, 40, 41,
 )]
 # fmt: on
-print(
-    f"Rearranged Tom's Hardware data: {toms_data.shape[0]} instances, "
-    f"{toms_data.shape[1]} features."
-)
+
+# Once the columns match, we can scale certain parts of the Tom's Hardware dataset so
+# that it can be meaningfully compared to the Twitter dataset. There are two
+# immediately apparent methods for this:
+#
+# 1. Scale the columns in the Tom's Hardware dataset by the ratio between the maximum
+#    value in that column and the maximum value in the corresponding column from the
+#    Twitter dataset. This approach will allow us to avoid modifying the (large)
+#    Twitter dataset, and will keep the values of the Twitter dataset real.
+# 2. Normalize all columns in both datasets to the same range. This approach will
+#    allow us to more easily compare axes between themselves.
+#
+# We will prefer the second approach because we intend to merge the datasets.
+twitter_data /= twitter_data.max(axis=0)
+toms_data /= toms_data.max(axis=0)
