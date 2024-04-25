@@ -177,3 +177,6 @@ toms_data = toms_data[:, (
 # We will prefer the second approach because we intend to merge the datasets.
 twitter_data /= twitter_data.max(axis=0)
 toms_data /= toms_data.max(axis=0)
+
+# Finally, we can concatenate the datasets.
+merged_data = np.concatenate((twitter_data, toms_data), axis=0)
