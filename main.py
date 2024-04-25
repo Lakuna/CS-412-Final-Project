@@ -5,7 +5,6 @@ import pathlib
 import typing
 
 import numpy as np
-from numpy import random
 from matplotlib import pyplot as plt
 from sklearn import cluster, inspection, mixture, model_selection, neighbors
 
@@ -274,12 +273,3 @@ _ = display.ax_.legend(
 _ = display.ax_.set_title("KNN (K=1) Classifier")
 _ = display.ax_.axis([0, 1, 0, 1])
 plt.show()
-
-# Use k-means clustering to train on these axes.
-km_classifier = cluster.KMeans(2).fit(X_train)
-print(f"K-means score: {km_classifier.score(X_test)}")
-
-# # Use expectation-maximization for learning a Gaussian mixture model to train on these
-# # axes.
-em_classifier = mixture.GaussianMixture(2).fit(X_train)
-print(f"Expectation-maximization score: {em_classifier.score(X_test)}")
