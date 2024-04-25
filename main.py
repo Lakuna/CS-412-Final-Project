@@ -278,56 +278,8 @@ plt.show()
 # Use k-means clustering to train on these axes.
 km_classifier = cluster.KMeans(2).fit(X_train)
 print(f"K-means score: {km_classifier.score(X_test)}")
-display = inspection.DecisionBoundaryDisplay.from_estimator(
-    km_classifier,
-    X,
-    plot_method="pcolormesh",
-    response_method="predict",
-    xlabel="Number of Created Discussions (NCD)",
-    ylabel="Number of Authors (NA)",
-    ax=plt.gca(),
-    shading="auto",
-    alpha=0.5,
-)
-scatter = display.ax_.scatter(X[:, 0], X[:, 1], c=y, edgecolors="k")
-_ = display.ax_.legend(
-    scatter.legend_elements()[0],
-    ("Twitter", "Tom's Hardware"),
-    loc="lower right",
-    title="Sources",
-)
-_ = display.ax_.scatter(
-    km_classifier.cluster_centers_[:, 0],
-    km_classifier.cluster_centers_[:, 1],
-    color=["blue", "red"],
-    edgecolors="k",
-)
-_ = display.ax_.set_title("K-Means Classifier")
-_ = display.ax_.axis([0, 1, 0, 1])
-plt.show()
 
 # # Use expectation-maximization for learning a Gaussian mixture model to train on these
 # # axes.
 em_classifier = mixture.GaussianMixture(2).fit(X_train)
 print(f"Expectation-maximization score: {em_classifier.score(X_test)}")
-display = inspection.DecisionBoundaryDisplay.from_estimator(
-    em_classifier,
-    X,
-    plot_method="pcolormesh",
-    response_method="predict",
-    xlabel="Number of Created Discussions (NCD)",
-    ylabel="Number of Authors (NA)",
-    ax=plt.gca(),
-    shading="auto",
-    alpha=0.5,
-)
-scatter = display.ax_.scatter(X[:, 0], X[:, 1], c=y, edgecolors="k")
-_ = display.ax_.legend(
-    scatter.legend_elements()[0],
-    ("Twitter", "Tom's Hardware"),
-    loc="lower right",
-    title="Sources",
-)
-_ = display.ax_.set_title("Expectation-Maximization Classifier")
-_ = display.ax_.axis([0, 1, 0, 1])
-plt.show()
