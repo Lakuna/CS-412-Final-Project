@@ -5,8 +5,8 @@ import pathlib
 import typing
 
 import numpy as np
-from numpy import random
 from matplotlib import pyplot as plt
+from sklearn import cluster, inspection, mixture, model_selection, neighbors
 
 # Load Twitter data into a NumPy array.
 #
@@ -244,24 +244,51 @@ def display_all_axes(
 
 # `display_all_axes` was used to determine which axes are best for clustering the
 # source sites. It turns out that NCD (column 0) versus NA (column 56) at time step
-# zero are best for this task. From this point on, we use K-nearest neighbors to train
-# on these axes.
+# zero are best for this task.
+X = merged_data[:, (0, 56)]
+y = merged_data[:, -1]
+X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, stratify=y)
 
-rng = random.default_rng()
+# Use k-nearest neighbors to train on these axes. By trying with various $k$, it can be
+# determined that choice of $k$ barely matters (with $k=1$ giving the best accuracy).
+knn_classifier = neighbors.KNeighborsClassifier(1).fit(X_train, y_train)
+print(f"K-nearest neighbors (k=1) score: {knn_classifier.score(X_test, y_test)}")
 
-X1 = twitter_data[:, (0, 56)]
-y1 = np.ones(X1.shape[0])
-
-X2 = toms_data[:, (0, 56)]
-y2 = np.zeros(X2.shape[0])
-
-X = np.concatenate((X1, X2), axis=0)
-y = np.concatenate((y1, y2), axis=0)
-
-indices = np.arange(X.shape[0])
-rng.shuffle(indices)
-X = X[indices, :]
-y = y[indices]
-
-plt.plot(X1[:, 0], X1[:, 1], "bo", X2[:, 0], X2[:, 1], "ro")
+# Display k-nearest neighbors result.
+axis = plt.gca()
+axis.set_xlim((0, 1))
+axis.set_ylim((0, 1))
+display = inspection.DecisionBoundaryDisplay.from_estimator(
+    knn_classifier,
+    X_test,
+    plot_method="pcolormesh",
+    xlabel="Number of Created Discussions (NCD)",
+    ylabel="Number of Authors (NA)",
+    shading="auto",
+    alpha=0.5,
+    ax=axis,
+)
+scatter = display.ax_.scatter(X[:, 0], X[:, 1], c=y, edgecolors="k")
+_ = display.ax_.legend(
+    scatter.legend_elements()[0],
+    ["Twitter", "Tom's Hardware"],
+    loc="lower right",
+    title="Classes",
+)
+_ = display.ax_.set_title("KNN (K=1) Classification")
 plt.show()
+
+# # Use k-means clustering to train on these axes.
+# km_classifier = cluster.KMeans(2).fit(X_train)
+# print(f"K-means score: {km_classifier.score(X_test)}")
+
+# # Use agglomerative clustering to train on these axes.
+# ac_classifier = cluster.AgglomerativeClustering(2).fit(X_train, y_train)
+# print(f"Agglomerative clustering score: {ac_classifier.score(X_test, y_test)}")
+# inspection.DecisionBoundaryDisplay.from_estimator(ac_classifier, X_test)
+
+# # Use expectation-maximization for learning a Gaussian mixture model to train on these
+# # axes.
+# em_classifier = mixture.GaussianMixture(2).fit(X_train)
+# print(f"Expectation-maximization score: {em_classifier.score(X_test)}")
+# inspection.DecisionBoundaryDisplay.from_estimator(em_classifier, X_test)
