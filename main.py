@@ -5,6 +5,7 @@ import pathlib
 import typing
 
 import numpy as np
+from numpy import random
 from matplotlib import pyplot as plt
 
 # Load Twitter data into a NumPy array.
@@ -239,3 +240,28 @@ def display_all_axes(
                     ],
                 )
                 plt.show()
+
+
+# `display_all_axes` was used to determine which axes are best for clustering the
+# source sites. It turns out that NCD (column 0) versus NA (column 56) at time step
+# zero are best for this task. From this point on, we use K-nearest neighbors to train
+# on these axes.
+
+rng = random.default_rng()
+
+X1 = twitter_data[:, (0, 56)]
+y1 = np.ones(X1.shape[0])
+
+X2 = toms_data[:, (0, 56)]
+y2 = np.zeros(X2.shape[0])
+
+X = np.concatenate((X1, X2), axis=0)
+y = np.concatenate((y1, y2), axis=0)
+
+indices = np.arange(X.shape[0])
+rng.shuffle(indices)
+X = X[indices, :]
+y = y[indices]
+
+plt.plot(X1[:, 0], X1[:, 1], "bo", X2[:, 0], X2[:, 1], "ro")
+plt.show()
