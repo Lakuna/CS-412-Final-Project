@@ -6,7 +6,7 @@ import typing
 
 import numpy as np
 from matplotlib import pyplot as plt
-from sklearn import cluster, inspection, mixture, model_selection, neighbors
+from sklearn import inspection, model_selection, neighbors
 
 # Load Twitter data into a NumPy array.
 #
