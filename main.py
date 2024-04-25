@@ -131,4 +131,55 @@ print(
 #    predict the mean NAD and Tom's Hardware's being used to predict the mean ND.
 # 5. It is never explicitly stated how long each time period is or whether it's the
 #    same length between datasets, but it is implied that both datasets use intervals
-#    of one week.
+#    of one week. Additionally, since both datasets were uploaded in the same month,
+#    it can be assumed that each $t$ represents the same time period between the
+#    datasets.
+
+# Start by removing extraneous columns from each dataset:
+#
+# From Tom's Hardware:
+# - Each column for data in the eighth time period: 7, 15, 23, 31, 39, 47, 55, 63, 71,
+#   79, 87, 95.
+# - Each column of ND data: 40, 41, 42, 43, 44, 45, 46, 47.
+# - The prediction column: 96.
+#
+# From Twitter:
+# - The prediction column: 77.
+twitter_data = np.delete(twitter_data, (77), axis=1)
+print(
+    f"Trimmed Twitter data: {twitter_data.shape[0]} instances, "
+    f"{twitter_data.shape[1]} features."
+)
+
+toms_data = np.delete(
+    toms_data,
+    (7, 15, 23, 31, 39, 40, 41, 42, 43, 44, 45, 46, 47, 55, 63, 71, 79, 87, 95, 96),
+    axis=1,
+)
+print(
+    f"Trimmed Tom's Hardware data: {toms_data.shape[0]} instances, "
+    f"{toms_data.shape[1]} features."
+)
+
+# Then, rearrange the columns in the Tom's Hardware dataset to match the order of the
+# columns in the Twitter dataset. Refer to the table above to see how these values were
+# determined.
+# fmt: off
+toms_data = toms_data[:, (
+     0,  1,  2,  3,  4,  5,  6,
+    21, 22, 23, 24, 25, 26, 27,
+    70, 71, 72, 73, 74, 75, 76,
+     7,  8,  9, 10, 11, 12, 13,
+    28, 29, 30, 31, 32, 33, 34,
+    42, 43, 44, 45, 46, 47, 48,
+    49, 50, 51, 52, 53, 54, 55,
+    56, 57, 58, 59, 60, 61, 62,
+    63, 64, 65, 66, 67, 68, 69,
+    14, 15, 16, 17, 18, 19, 20,
+    35, 36, 37, 38, 39, 40, 41,
+)]
+# fmt: on
+print(
+    f"Rearranged Tom's Hardware data: {toms_data.shape[0]} instances, "
+    f"{toms_data.shape[1]} features."
+)
