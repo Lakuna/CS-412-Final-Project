@@ -4,6 +4,7 @@ import csv
 import pathlib
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 # Load Twitter data into a NumPy array.
 #
@@ -174,9 +175,70 @@ toms_data = toms_data[:, (
 # 2. Normalize all columns in both datasets to the same range. This approach will
 #    allow us to more easily compare axes between themselves.
 #
-# We will prefer the second approach because we intend to merge the datasets.
+# We will prefer the latter approach because we intend to merge the datasets.
 twitter_data /= twitter_data.max(axis=0)
 toms_data /= toms_data.max(axis=0)
 
+# Add a column representing the site that the instance came from ($0$ for Twitter or
+# $1$ for Tom's Hardware).
+twitter_data = np.hstack((twitter_data, np.zeros((twitter_data.shape[0], 1))))
+toms_data = np.hstack((toms_data, np.ones((toms_data.shape[0], 1))))
+
 # Finally, we can concatenate the datasets.
-merged_data = np.concatenate((twitter_data, toms_data), axis=0)
+merged_data = np.vstack((twitter_data, toms_data))
+
+# Set constants for accessing data.
+num_time_steps = 7
+num_features = merged_data.shape[1] - 1
+num_primary_features = (int)(num_features / num_time_steps)
+primary_feature_abbr = (
+    "NCD",
+    "AI",
+    "AS(NA)",
+    "BL",
+    "NAC",
+    "AS(NAC)",
+    "CS",
+    "AT",
+    "NA",
+    "ADL",
+    "NAD",
+)
+primary_feature_labels = (
+    "Number of Created Discussions",
+    "Author Increase",
+    "Attention Level Measured with Number of Authors",
+    "Burstiness Level",
+    "Number of Atomic Containers",
+    "Attention Level",
+    "Contribution Sparseness",
+    "Author Interaction",
+    "Number of Authors",
+    "Average Discussions Length",
+    "Number of Active Discussions",
+)
+
+# For each time step...
+for t in range(num_time_steps):
+    # For each axis...
+    for x in range(num_primary_features):
+        # For each other axis...
+        for y in range(num_primary_features):
+            # Don't compare to self or repeat with swapped axes.
+            if y <= x:
+                continue
+
+            # Plot the axes against each other.
+            plt.figure(num=f"t={t} {primary_feature_abbr[x]}x{primary_feature_abbr[y]}")
+            plt.title(f"Time Step {t}")
+            plt.xlabel(f"{primary_feature_labels[x]} ({primary_feature_abbr[x]})")
+            plt.ylabel(f"{primary_feature_labels[y]} ({primary_feature_abbr[y]})")
+            plt.scatter(
+                merged_data[:, x * num_time_steps + t],
+                merged_data[:, y * num_time_steps + t],
+                color=[
+                    ("blue" if source_set == 0 else "red")
+                    for source_set in merged_data[:, -1]
+                ],
+            )
+            plt.show()
