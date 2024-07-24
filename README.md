@@ -9,4 +9,3 @@ Group members:
 - Travis Martin
 - Vibha Suneel Navale
 - Raunak Singh
-- Ackchat Omar
